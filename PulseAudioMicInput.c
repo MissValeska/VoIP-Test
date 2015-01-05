@@ -69,13 +69,13 @@ void playback_connected_input(void *data, size_t bytes) {
 
 }
 
-int get_mic_input(struct getmic_inet1 getmic_inet) {
+int get_mic_input(struct getmic_inet1 *getmic_inet) {
 
 int sockfd; 
 struct sockaddr_in dest_addr;
 
-sockfd = getmic_inet.sockfd1;
-dest_addr = getmic_inet.dest_addr1;
+sockfd = getmic_inet->sockfd1;
+dest_addr = getmic_inet->dest_addr1;
 
    pa_sample_spec ss;
 
@@ -101,13 +101,13 @@ pa_strerror(error));
     uint8_t buf[BUFSIZE];
 
         /* Record some data ... */
-    if (pa_simple_read(s, buf, sizeof(buf), &error) < 0) {
+    if (pa_simple_read(s, buf, BUFSIZE, &error) < 0) {
     	fprintf(stderr, __FILE__": pa_simple_read() failed: %s\n",
 pa_strerror(error));
 	close(sockfd);
         fatal(s, 2);
         }
-        inet_sendto(sockfd, buf, sizeof(buf), dest_addr);
+        inet_sendto(sockfd, buf, BUFSIZE, dest_addr);
     }
     return 0;
 }
