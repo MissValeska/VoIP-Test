@@ -81,10 +81,14 @@ int get_mic_input(void) {
     FILE *fp1;
     char *c;
     int z;
+    
+    c = (char *) malloc (100);
     while(1) {
     fp1 = fopen("participants-num.txt", "r");
 
-    *c = getc(fp1);
+    fgets(c, 100, fp1);
+    
+    *strrchr(c, '\n') = '\0';
     z = atoi(c);
     
     printf("%s\n %d\n", c, z);

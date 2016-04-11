@@ -70,8 +70,8 @@ void IP_File(void) {
     FILE *fp;
     FILE *fp1;
 
-   fp = fopen("participants.txt", "w");
-   fp1 = fopen("participants-num.txt", "w");
+   fp = fopen("participants.txt", "w+");
+   fp1 = fopen("participants-num.txt", "w+");
    fprintf(fp1, "%s\n", "0");
    fclose(fp);
    fclose(fp1);
@@ -99,8 +99,13 @@ if((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 
 printf("wait_for_connection listenfd %d\n", listenfd);
 
+int iSetOption = 1;
+
+setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &iSetOption,
+        sizeof(iSetOption));
+
 if(bind(listenfd, (struct sockaddr*)&dest_addr, sizeof(dest_addr)) < 0) {
-	printf("Error in server bind() 9 %i\n", listenfd);
+	printf("Error in server bind() 9 %i %d\n", listenfd, errno);
 }
 
 while(1) {
@@ -140,17 +145,36 @@ if(ipstr != NULL) {
     char *c;
     int z;
     
+    c = (char *) malloc (100);
+    
     fp = fopen("participants.txt", "a");
     fprintf(fp, "%s\n", ipstr);
     
-    fp1 = fopen("participants-num.txt", "r+");
-    *c = getc(fp1);
+    fp1 = fopen("participants-num.txt", "r");
+    
+    fgets(c, 100, fp1);
+    
+    printf("d\n");
+    *strrchr(c, '\n') = '\0';
+    printf("s\n");
     z = atoi(c);
     z++;
-    sprintf(strnum, "%d", z);
-    fprintf(fp1, "%s\n", strnum);
     
-    printf("%s\n %s\n %d\n", strnum, c, z);
+    printf("hi\n");
+    
+    fclose(fp1);
+    
+    printf("Progress!\n");
+    
+    fp1 = fopen("participants-num.txt", "w+");
+    
+    printf("E!!\n");
+    
+    fprintf(fp1, "%d\n", z);
+    
+    printf("rawqr\n");
+    
+    printf("wait_for_connection() %s %d\n", c, z);
     
     fclose(fp);
     fclose(fp1);
@@ -179,7 +203,7 @@ if((sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
 
 int iSetOption = 1;
 
-setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (char*)&iSetOption,
+setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &iSetOption,
         sizeof(iSetOption));
         
 result = connect(sockfd, (struct sockaddr*)&dest_addr, sizeof(dest_addr));
@@ -198,17 +222,36 @@ close(sockfd);
     char *c;
     int z;
     
+    c = (char *) malloc (100);
+    
     fp = fopen("participants.txt", "a");
     fprintf(fp, "%s\n", ipaddress);
     
-    fp1 = fopen("participants-num.txt", "r+");
-    *c = getc(fp1);
+    fp1 = fopen("participants-num.txt", "r");
+    
+    fgets(c, 100, fp1);
+    
+    printf("d\n");
+    *strrchr(c, '\n') = '\0';
+    printf("s\n");
     z = atoi(c);
     z++;
-    sprintf(strnum, "%d", z);
-    fprintf(fp1, "%s\n", strnum);
     
-    printf("%s\n %s\n %d\n", strnum, c, z);
+    printf("hi\n");
+    
+    fclose(fp1);
+    
+    printf("Progress!\n");
+    
+    fp1 = fopen("participants-num.txt", "w+");
+    
+    printf("E!!\n");
+    
+    fprintf(fp1, "%d\n", z);
+    
+    printf("rawqr\n");
+    
+    printf("request_connection() %s %d\n", c, z);
     
     fclose(fp);
     fclose(fp1);
@@ -288,8 +331,10 @@ char *ipaddress = (char *)malloc(100);
 FILE *fp;
 FILE *fp1;
 
-char *c;
-int z;
+    char *c;
+    int z;
+    
+    c = (char *) malloc (100);
 
 int ch=0;
 int lines=0;
@@ -297,8 +342,10 @@ int lines=0;
 fp = fopen("participants.txt", "r");
 fp1 = fopen("participants-num.txt", "r");
 
-*c = getc(fp1);
-z = atoi(c);
+    fgets(c, 100, fp1);
+    
+    *strrchr(c, '\n') = '\0';
+    z = atoi(c);
     
 printf("%s\n %d\n", c, z);
 
@@ -339,7 +386,7 @@ line_sound.buf_len = strct.buf_len;
 
 for(x = 0; x < lines2; x++) {
  
-    fgets(ipaddress, 255, (FILE*)fp);
+    fgets(ipaddress, 255, fp);
 
     *strrchr(ipaddress, '\n') = '\0';
     
